@@ -26,5 +26,8 @@ dependencies {
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'  // biblioteca comum responsálvel por fazer requisições http
+    implementation 'com.squareup.retrofit2:converter-jackson:2.5.0' //biblioteca responsável por fazer conversões em JSON
 }
 
