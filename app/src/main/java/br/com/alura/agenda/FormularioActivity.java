@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,6 +22,7 @@ import java.io.File;
 
 import br.com.alura.agenda.dao.AlunoDAO;
 import br.com.alura.agenda.modelo.Aluno;
+import br.com.alura.agenda.tasks.InsereAlunoTask;
 
 public class FormularioActivity extends AppCompatActivity {
 
@@ -48,7 +50,9 @@ public class FormularioActivity extends AppCompatActivity {
                 Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 caminhoFoto = getExternalFilesDir(null) + "/" + System.currentTimeMillis() + ".jpg";
                 File arquivoFoto = new File(caminhoFoto);
-                intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(arquivoFoto));
+                String authority = BuildConfig.APPLICATION_ID +".fileprovider";
+                intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(FormularioActivity.this, authority, arquivoFoto));
+//                intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(arquivoFoto));
                 startActivityForResult(intentCamera, CODIGO_CAMERA);
             }
         });
@@ -85,6 +89,8 @@ public class FormularioActivity extends AppCompatActivity {
                     dao.insere(aluno);
                 }
                 dao.close();
+
+                new InsereAlunoTask(aluno).execute();
 
                 Toast.makeText(FormularioActivity.this, "Aluno " + aluno.getNome() + " salvo!", Toast.LENGTH_SHORT).show();
 
