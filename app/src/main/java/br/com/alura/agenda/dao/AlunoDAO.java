@@ -23,7 +23,8 @@ public class AlunoDAO extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = "CREATE TABLE Alunos (id INTEGER PRIMARY KEY, " +
+//        String sql = "CREATE TABLE Alunos (id INTEGER PRIMARY KEY, " +
+        String sql = "CREATE TABLE Alunos (id CHAR(36) PRIMARY KEY, " +
                 "nome TEXT NOT NULL, " +
                 "endereco TEXT, " +
                 "telefone TEXT, " +
@@ -82,15 +83,43 @@ public class AlunoDAO extends SQLiteOpenHelper {
     public void insere(Aluno aluno) {
         SQLiteDatabase db = getWritableDatabase();
 
+        insereUUIDSeNecessario(aluno);
         ContentValues dados = pegaDadosDoAluno(aluno);
 
-        long id = db.insert("Alunos", null, dados);
+        db.insert("Alunos", null, dados);
+//        long id = db.insert("Alunos", null, dados);
 //        aluno.setId(id);
+    }
+
+    private void insereUUIDSeNecessario(Aluno aluno) {
+        if (  aluno.getId() == null  ){
+            aluno.setId(geraUUID());
+        }
+    }
+
+    public void sincroniza(List<Aluno> alunoList) {
+        for (Aluno aluno:
+             alunoList) {
+            if (existe(aluno)){
+                altera(aluno);
+            }else {
+                insere(aluno);
+            }
+        }
+    }
+
+    private boolean existe(Aluno aluno) {
+        SQLiteDatabase db = getReadableDatabase();
+        String existe = "SELECT id FROM Alunos WHERE id = ? LIMIT 1;";
+        Cursor cursor = db.rawQuery(existe, new String[]{aluno.getId()});
+        int quantidade = cursor.getCount();
+        return (quantidade > 0);
     }
 
     @NonNull
     private ContentValues pegaDadosDoAluno(Aluno aluno) {
         ContentValues dados = new ContentValues();
+        dados.put("id", aluno.getId());
         dados.put("nome", aluno.getNome());
         dados.put("endereco", aluno.getEndereco());
         dados.put("telefone", aluno.getTelefone());
