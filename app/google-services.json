@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "5257530708",
+    "firebase_url": "https://agenda-sync-95dbc.firebaseio.com",
+    "project_id": "agenda-sync-95dbc",
+    "storage_bucket": "agenda-sync-95dbc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5257530708:android:3a5ad5bdb69d3b6a",
+        "android_client_info": {
+          "package_name": "br.com.alura.agenda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "5257530708-28mprejngibvn80kq2plq2fjj2rjn7gh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.alura.agenda",
+            "certificate_hash": "8eab1d6a19ae1f43b4ed17b708cc2fd423a79668"
+          }
+        },
+        {
+          "client_id": "5257530708-h5026meamcitq4i16t848umpm8kobmo8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQNRMqWqKishC9skChSEVErQdOaOmczaU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "5257530708-h5026meamcitq4i16t848umpm8kobmo8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
