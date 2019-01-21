@@ -18,11 +18,16 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 import br.com.alura.agenda.adapter.AlunosAdapter;
 import br.com.alura.agenda.dao.AlunoDAO;
 import br.com.alura.agenda.dto.AlunoSync;
+import br.com.alura.agenda.event.AtualizaListaAlunoEvent;
 import br.com.alura.agenda.modelo.Aluno;
 import br.com.alura.agenda.retrofit.RetrofitInicializador;
 import br.com.alura.agenda.tasks.EnviaAlunosTask;
@@ -34,11 +39,14 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     private ListView listaAlunos;
     private SwipeRefreshLayout swipe;
+    private EventBus eventBus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_alunos);
+
+        eventBus = EventBus.getDefault();
 
         listaAlunos = (ListView) findViewById(R.id.lista_alunos);
 
@@ -74,6 +82,12 @@ public class ListaAlunosActivity extends AppCompatActivity {
         buscaAlunosDoWebService();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void atualizaListaAlunoEvent(AtualizaListaAlunoEvent event){
+        // Subscrible do EventBus
+        carregaLista();
+    }
+
     private void carregaLista() {
         AlunoDAO dao = new AlunoDAO(this);
         List<Aluno> alunos = dao.buscaAlunos();
@@ -91,8 +105,28 @@ public class ListaAlunosActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        eventBus.register(this);
         carregaLista();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        /*
+        * Um detalhe quando fazemos uso do Event Bus é que quando registramos uma classe para
+        * receber eventos, existem situações que não faz mais sentido para receber tais eventos.
+        * Como por exemplo a nossa ListaAlunosActivity, se analisarmos o motivo do uso do Event
+        * Bus é justamente para que ela chame o método carregaLista(). Entretanto, entrar em um
+        * estado de pausa, isto é, onPause() a tela não estará mais visível e mesmo assim estaremos
+        * recebendo um evento para alterar uma View, podendo até recebermos alguma exception do
+        * Android.
+        *
+        * Em outras palavras, quando fazemos uso do Event Bus e sabemos que em um determinado
+        * estado não faz mais sentido a classe ficar registrada, precisamos tirar o seu registro
+        * por meio do método unregister(). Porém, tenha ciência de que será necessário fazer um
+        * novo registro a partir do register() caso queira receber novamente os eventos.
+        * */
+        eventBus.unregister(this);
     }
 
     private void buscaAlunosDoWebService() {

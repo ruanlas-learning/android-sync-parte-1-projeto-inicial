@@ -34,7 +34,8 @@ dependencies {
     // Biblioteca responsável por monitorar todo o processo de requisição http (requisições, respostas
     // do servidor, etc)
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
-//    implementation 'com.google.firebase:firebase-messaging:17.0.0:15.0.0'
+    //    implementation 'com.google.firebase:firebase-messaging:17.0.0:15.0.0'
     implementation 'com.google.firebase:firebase-messaging:17.3.3'
     implementation 'com.google.firebase:firebase-core:16.0.4'
+    implementation 'org.greenrobot:eventbus:3.1.1'
 }
