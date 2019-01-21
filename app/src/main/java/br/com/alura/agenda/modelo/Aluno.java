@@ -11,7 +11,9 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Aluno implements Serializable {
 
-//    @JsonProperty("idCliente")
+    private static final int DESATIVADO = 1;
+    private static final int ATIVADO = 0;
+    //    @JsonProperty("idCliente")
     private String id;
     private String nome;
     private String endereco;
@@ -19,6 +21,15 @@ public class Aluno implements Serializable {
     private String site;
     private Double nota;
     private String caminhoFoto;
+    private int desativado;
+
+    public int getDesativado() {
+        return desativado;
+    }
+
+    public void setDesativado(int desativado) {
+        this.desativado = desativado;
+    }
 
     public String getId() {
         return id;
@@ -79,5 +90,9 @@ public class Aluno implements Serializable {
     @Override
     public String toString() {
         return getId() + " - " + getNome();
+    }
+
+    public boolean estaDesativado() {
+        return this.getDesativado() == DESATIVADO;
     }
 }
