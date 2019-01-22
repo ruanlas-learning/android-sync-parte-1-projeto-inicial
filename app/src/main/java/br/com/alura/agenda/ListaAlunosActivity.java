@@ -26,10 +26,10 @@ import java.util.List;
 
 import br.com.alura.agenda.adapter.AlunosAdapter;
 import br.com.alura.agenda.dao.AlunoDAO;
-import br.com.alura.agenda.dto.AlunoSync;
 import br.com.alura.agenda.event.AtualizaListaAlunoEvent;
 import br.com.alura.agenda.modelo.Aluno;
 import br.com.alura.agenda.retrofit.RetrofitInicializador;
+import br.com.alura.agenda.sinc.AlunoSincronizador;
 import br.com.alura.agenda.tasks.EnviaAlunosTask;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,6 +37,7 @@ import retrofit2.Response;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
+    private final AlunoSincronizador sincronizador = new AlunoSincronizador(this);
     private ListView listaAlunos;
     private SwipeRefreshLayout swipe;
     private EventBus eventBus;
@@ -74,17 +75,20 @@ public class ListaAlunosActivity extends AppCompatActivity {
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                buscaAlunosDoWebService();
+                sincronizador.buscaAlunosDoWebService();
             }
         });
 
         registerForContextMenu(listaAlunos);
-        buscaAlunosDoWebService();
+        sincronizador.buscaAlunosDoWebService();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void atualizaListaAlunoEvent(AtualizaListaAlunoEvent event){
         // Subscrible do EventBus
+        if (swipe.isRefreshing()){
+            swipe.setRefreshing(false);
+        }
         carregaLista();
     }
 
@@ -130,28 +134,8 @@ public class ListaAlunosActivity extends AppCompatActivity {
     }
 
     private void buscaAlunosDoWebService() {
-        Call<AlunoSync> call = new RetrofitInicializador().getAlunoService().lista();
 
-        call.enqueue(new Callback<AlunoSync>() {
-            @Override
-            public void onResponse(Call<AlunoSync> call, Response<AlunoSync> response) {
-                //// O parâmetro call => define todas as informações da requisição
-                //// O parâmetro response => obtém a resposta que o servidor retornou
-                AlunoSync alunoSync = response.body();
-                List<Aluno> alunoList = alunoSync.getAlunoList();
-                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
-                dao.sincroniza(alunoList);
-                dao.close();
-                carregaLista();
-                swipe.setRefreshing(false);
-            }
-
-            @Override
-            public void onFailure(Call<AlunoSync> call, Throwable t) {
-                Log.e("onFailure chamado", t.getMessage());
-                swipe.setRefreshing(false);
-            }
-        });
+        sincronizador.buscaAlunosDoWebService();
     }
 
     @Override
