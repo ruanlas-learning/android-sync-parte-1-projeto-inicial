@@ -76,11 +76,13 @@ public class ListaAlunosActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 sincronizador.buscaAlunosDoWebService();
+                sincronizador.sincronizaAlunosInternos();
             }
         });
 
         registerForContextMenu(listaAlunos);
         sincronizador.buscaAlunosDoWebService();
+        sincronizador.sincronizaAlunosInternos();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -100,6 +102,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
         for (Aluno aluno:
              alunos) {
             Log.i("Id do Aluno", String.valueOf(aluno.getId()));
+            Log.i("Aluno sincronizado", String.valueOf(aluno.getSincronizado()));
         }
 
         AlunosAdapter adapter = new AlunosAdapter(this, alunos);

@@ -81,4 +81,23 @@ public class AlunoSincronizador {
             }
         };
     }
+
+    public void sincronizaAlunosInternos(){
+        final AlunoDAO dao = new AlunoDAO(context);
+        List<Aluno> listaNaoSincronizados = dao.listaNaoSincronizados();
+        Call<AlunoSync> call = new RetrofitInicializador().getAlunoService().atualiza(listaNaoSincronizados);
+        call.enqueue(new Callback<AlunoSync>() {
+            @Override
+            public void onResponse(Call<AlunoSync> call, Response<AlunoSync> response) {
+                AlunoSync alunoSync = response.body();
+                dao.sincroniza(alunoSync.getAlunoList());
+                dao.close();
+            }
+
+            @Override
+            public void onFailure(Call<AlunoSync> call, Throwable t) {
+
+            }
+        });
+    }
 }
