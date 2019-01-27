@@ -71,13 +71,13 @@ public class ListaAlunosActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 sincronizador.buscaAlunosDoWebService();
-                sincronizador.sincronizaAlunosInternos();
+//                sincronizador.sincronizaAlunosInternos();
             }
         });
 
         registerForContextMenu(listaAlunos);
         sincronizador.buscaAlunosDoWebService();
-        sincronizador.sincronizaAlunosInternos();
+//        sincronizador.sincronizaAlunosInternos();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
