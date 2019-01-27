@@ -7,6 +7,9 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import br.com.alura.agenda.ListaAlunosActivity;
@@ -59,18 +62,11 @@ public class AlunoSincronizador {
                 //// O parâmetro response => obtém a resposta que o servidor retornou
                 AlunoSync alunoSync = response.body();
 
-                String versao = alunoSync.getMomentoDaUltimaModificacao();
-
-                preferences.salvaVersao(versao);
-
-                List<Aluno> alunoList = alunoSync.getAlunoList();
-                AlunoDAO dao = new AlunoDAO(context);
-                dao.sincroniza(alunoList);
-                dao.close();
+                sincroniza(alunoSync);
 //                context.carregaLista();
 //                context.getSwipe().setRefreshing(false);
 
-                Log.i("versao", preferences.getVersao());
+//                Log.i("versao", preferences.getVersao());
 
                 bus.post(new AtualizaListaAlunoEvent());
 
@@ -86,16 +82,58 @@ public class AlunoSincronizador {
         };
     }
 
+    public void sincroniza(AlunoSync alunoSync) {
+        String versao = alunoSync.getMomentoDaUltimaModificacao();
+
+        Log.i("versao externa", versao);
+
+        if (temVersaoNova(versao)){
+
+            preferences.salvaVersao(versao);
+
+            Log.i("versao atual", preferences.getVersao());
+
+            List<Aluno> alunoList = alunoSync.getAlunoList();
+            AlunoDAO dao = new AlunoDAO(context);
+            dao.sincroniza(alunoList);
+            dao.close();
+        }
+    }
+
+    private boolean temVersaoNova(String versao) {
+        if (!preferences.temVersao())
+            return true;
+//        "2019-01-27T20:21:16.492" - formato
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        try {
+            Date dataExterna = format.parse(versao);
+            String versaoInterna = preferences.getVersao();
+
+            Log.i("versao interna", versaoInterna);
+            
+            Date dataInterna = format.parse(versaoInterna);
+
+            return dataExterna.after(dataInterna);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private void sincronizaAlunosInternos(){
         final AlunoDAO dao = new AlunoDAO(context);
         List<Aluno> listaNaoSincronizados = dao.listaNaoSincronizados();
+        dao.close();
+
         Call<AlunoSync> call = new RetrofitInicializador().getAlunoService().atualiza(listaNaoSincronizados);
         call.enqueue(new Callback<AlunoSync>() {
             @Override
             public void onResponse(Call<AlunoSync> call, Response<AlunoSync> response) {
                 AlunoSync alunoSync = response.body();
-                dao.sincroniza(alunoSync.getAlunoList());
-                dao.close();
+//                dao.sincroniza(alunoSync.getAlunoList());
+//                dao.close();
+                sincroniza(alunoSync);
             }
 
             @Override
