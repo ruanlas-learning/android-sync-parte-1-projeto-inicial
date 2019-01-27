@@ -1,7 +1,6 @@
 package br.com.alura.agenda.modelo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
@@ -13,6 +12,8 @@ public class Aluno implements Serializable {
 
     private static final int DESATIVADO = 1;
     private static final int ATIVADO = 0;
+    public static final int SINCRONIZADO = 1;
+    public static final int DESSINCRONIZADO = 0;
     //    @JsonProperty("idCliente")
     private String id;
     private String nome;
@@ -106,10 +107,15 @@ public class Aluno implements Serializable {
     }
 
     public void sincroniza() {
-        this.sincronizado = 1;
+        this.sincronizado = SINCRONIZADO;
     }
 
     public void desincroniza() {
-        this.sincronizado = 0;
+        this.sincronizado = DESSINCRONIZADO;
+    }
+
+    public void desativa() {
+        this.desativado = DESATIVADO;
+        desincroniza();
     }
 }
